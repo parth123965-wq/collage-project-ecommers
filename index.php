@@ -273,8 +273,8 @@ try {
     </div>
 
     <script>
-        function addToCart(productId) {
-            // Check if user session variable is accessible indirectly via PHP injection
+        // Replace the old addToCart function inside your index.php script section with this:
+        async function addToCart(productId) {
             const isLoggedIn = <?php echo isset($_SESSION['user_id']) ? 'true' : 'false'; ?>;
 
             if (!isLoggedIn) {
@@ -283,7 +283,24 @@ try {
                 return;
             }
 
-            alert('سيتم إرسال المنتج رقم ' + productId + ' إلى قاعدة بيانات السلة بالخطوة القادمة!');
+            try {
+                const response = await fetch('add_to_cart_api.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ productId: productId, quantity: 1 })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert(result.message);
+                    // Optional: You could redirect users directly to a cart preview screen here
+                } else {
+                    alert('خطأ: ' + result.message);
+                }
+            } catch (error) {
+                alert('حدث خطأ غير متوقع أثناء الاتصال بخادم السلة.');
+            }
         }
     </script>
 </body>
