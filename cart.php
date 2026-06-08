@@ -3,7 +3,6 @@
 session_start();
 require_once 'db_connect.php';
 
-// Force login check
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.html");
     exit;
@@ -12,36 +11,33 @@ if (!isset($_SESSION['user_id'])) {
 $userId = $_SESSION['user_id'];
 $message = "";
 
-// Handle item removal - Implementing your diagram's deletecart() method
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete') {
     $cartId = intval($_POST['cart_id'] ?? 0);
 
     try {
-        // Securely verify that the item belongs to the logged-in user before deleting
         $deleteStmt = $pdo->prepare("DELETE FROM Cart WHERE cart_id = ? AND u_id = ?");
         $deleteStmt->execute([$cartId, $userId]);
-        $message = "تم حذف المنتج من السلة بنجاح.";
+        $message = "Item removed from cart successfully.";
     } catch (PDOException $e) {
-        $message = "خطأ أثناء الحذف: " . $e->getMessage();
+        $message = "Error during deletion: " . $e->getMessage();
     }
 }
 
-// Fetch all active items in this user's cart
 try {
     $stmt = $pdo->prepare("SELECT * FROM Cart WHERE u_id = ?");
     $stmt->execute([$userId]);
     $cartItems = $stmt->fetchAll();
 } catch (PDOException $e) {
-    die("خطأ في قاعدة البيانات: " . $e->getMessage());
+    die("Database Error: " . $e->getMessage());
 }
 ?>
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سلة المشتريات الفاخرة | Arabic Luxury Store</title>
+    <title>Shopping Cart | Arabic Luxury Store</title>
     <style>
         :root {
             --primary-gold: #D4AF37;
@@ -78,7 +74,7 @@ try {
         .nav-links a {
             color: var(--text-light);
             text-decoration: none;
-            margin-right: 20px;
+            margin-left: 20px;
             font-size: 16px;
         }
 
@@ -94,8 +90,8 @@ try {
 
         h2 {
             color: var(--primary-gold);
-            border-right: 4px solid var(--primary-gold);
-            padding-right: 12px;
+            border-left: 4px solid var(--primary-gold);
+            padding-left: 12px;
             margin-bottom: 30px;
         }
 
@@ -104,11 +100,10 @@ try {
             color: var(--primary-gold);
             padding: 12px;
             border-radius: 6px;
-            border-right: 4px solid var(--primary-gold);
+            border-left: 4px solid var(--primary-gold);
             margin-bottom: 20px;
         }
 
-        /* Cart Layout Grid */
         .cart-wrapper {
             display: grid;
             grid-template-columns: 2fr 1fr;
@@ -121,7 +116,6 @@ try {
             }
         }
 
-        /* Table Styling */
         .cart-table-container {
             background-color: var(--card-bg);
             border-radius: 8px;
@@ -133,20 +127,18 @@ try {
         table {
             width: 100%;
             border-collapse: collapse;
-            text-align: right;
+            text-align: left;
         }
 
         th {
             border-bottom: 2px solid var(--primary-gold);
             padding: 12px;
             color: var(--text-muted);
-            font-weight: 600;
         }
 
         td {
             padding: 15px 12px;
             border-bottom: 1px solid #2A2A2A;
-            vertical-align: middle;
         }
 
         .product-title {
@@ -175,7 +167,6 @@ try {
             color: #fff;
         }
 
-        /* Summary Sidebar Box */
         .summary-box {
             background-color: var(--card-bg);
             border: 1px solid var(--primary-gold);
@@ -229,15 +220,15 @@ try {
 <body>
 
     <header>
-        <a href="index.php" class="logo">الْمَتْجَرُ العَرَبِيُّ</a>
+        <a href="index.php" class="logo">ARABIC LUXURY</a>
         <div class="nav-links">
-            <a href="index.php">الرئيسية</a>
-            <a href="logout.php" style="color: #FF4D4D;">خروج</a>
+            <a href="index.php">Home Shop</a>
+            <a href="logout.php" style="color: #FF4D4D;">Logout</a>
         </div>
     </header>
 
     <div class="cart-container">
-        <h2>سلة المشتريات الخاصة بك</h2>
+        <h2>Your Shopping Cart</h2>
 
         <?php if (!empty($message)): ?>
             <div class="alert-msg"><?php echo htmlspecialchars($message); ?></div>
@@ -250,11 +241,11 @@ try {
                     <table>
                         <thead>
                             <tr>
-                                <th>المنتج</th>
-                                <th>الكمية</th>
-                                <th>السعر الأساسي</th>
-                                <th>السعر شاملاً الضريبة</th>
-                                <th>إجراء</th>
+                                <th>Product</th>
+                                <th>Qty</th>
+                                <th>Price</th>
+                                <th>Price (+ Tax)</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -272,13 +263,13 @@ try {
                                         <span class="product-cat"><?php echo htmlspecialchars($item['CategoryName']); ?></span>
                                     </td>
                                     <td><strong><?php echo $item['p_qty']; ?></strong></td>
-                                    <td><?php echo number_format($item['p_price'], 2); ?> ر.س</td>
-                                    <td><?php echo number_format($item['p_pricewithtax'], 2); ?> ر.س</td>
+                                    <td>$<?php echo number_format($item['p_price'], 2); ?></td>
+                                    <td>$<?php echo number_format($item['p_pricewithtax'], 2); ?></td>
                                     <td>
                                         <form method="POST" style="margin:0;">
                                             <input type="hidden" name="cart_id" value="<?php echo $item['cart_id']; ?>">
                                             <input type="hidden" name="action" value="delete">
-                                            <button type="submit" class="btn-delete">إزالة</button>
+                                            <button type="submit" class="btn-delete">Remove</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -288,37 +279,36 @@ try {
                 </div>
 
                 <div class="summary-box">
-                    <h3>ملخص الطلب</h3>
+                    <h3>Order Summary</h3>
                     <div class="summary-row">
-                        <span>المجموع الفرعي:</span>
-                        <span><?php echo number_format($totalSubtotal, 2); ?> ر.س</span>
+                        <span>Subtotal:</span>
+                        <span>$<?php echo number_format($totalSubtotal, 2); ?></span>
                     </div>
                     <div class="summary-row">
-                        <span>ضريبة القيمة المضافة (15%):</span>
-                        <span><?php echo number_format($totalWithTax - $totalSubtotal, 2); ?> ر.س</span>
+                        <span>VAT (15%):</span>
+                        <span>$<?php echo number_format($totalWithTax - $totalSubtotal, 2); ?></span>
                     </div>
                     <div class="summary-row summary-total">
-                        <span>الإجمالي الكلي:</span>
-                        <span><?php echo number_format($totalWithTax, 2); ?> ر.س</span>
+                        <span>Total Amount:</span>
+                        <span>$<?php echo number_format($totalWithTax, 2); ?></span>
                     </div>
 
-                    <button class="btn-checkout" onclick="executeCheckout()">تأكيد عملية الشراء</button>
+                    <button class="btn-checkout" onclick="executeCheckout()">Proceed to Checkout</button>
                 </div>
 
             </div>
         <?php else: ?>
             <div style="text-align: center; padding: 40px; background-color: var(--card-bg); border-radius: 8px;">
-                <p style="color: var(--text-muted); font-size: 18px;">سلة المشتريات فارغة حالياً.</p>
-                <a href="index.php" style="color: var(--primary-gold); text-decoration: none; font-weight: bold;">العودة
-                    للتسوق من هنا</a>
+                <p style="color: var(--text-muted); font-size: 18px;">Your shopping cart is currently empty.</p>
+                <a href="index.php" style="color: var(--primary-gold); text-decoration: none; font-weight: bold;">Return to
+                    Store</a>
             </div>
         <?php endif; ?>
     </div>
 
     <script>
         function executeCheckout() {
-            alert('تم تأكيد طلبك بنجاح! شكراً لتسوقك معنا.');
-            // This satisfies the frontend flow completely.
+            alert('Your order has been verified and placed successfully! Thank you for shopping with us.');
         }
     </script>
 </body>

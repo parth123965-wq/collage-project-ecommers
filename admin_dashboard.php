@@ -3,18 +3,15 @@
 session_start();
 require_once 'db_connect.php';
 
-// Security Check: Only allow logged-in Admins
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    die("<h2 style='color:red; text-align:center; margin-top:50px;'>عذراً، غير مسموح لك بدخول هذه الصفحة. هذه اللوحة مخصصة للمشرفين فقط.</h2>");
+    die("<h2 style='color:red; text-align:center; margin-top:50px;'>Access Denied. Administrators Only.</h2>");
 }
 
 $message = "";
 
-// 1. Process Form Action Submissions (Implementing insertCategory and insertProduct)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
-    // Handle adding a new category
     if ($action === 'add_category') {
         $catName = trim($_POST['CategoryName'] ?? '');
         $catDesc = trim($_POST['CategoryDescription'] ?? '');
@@ -23,14 +20,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 $stmt = $pdo->prepare("INSERT INTO Category (CategoryName, CategoryDescription) VALUES (?, ?)");
                 $stmt->execute([$catName, $catDesc]);
-                $message = "تم إضافة الفئة بنجاح!";
+                $message = "Category added successfully!";
             } catch (PDOException $e) {
-                $message = "خطأ أثناء إضافة الفئة: " . $e->getMessage();
+                $message = "Error adding category: " . $e->getMessage();
             }
         }
     }
 
-    // Updated: Handle adding a new product WITH an actual image upload
     if ($action === 'add_product') {
         $pName = trim($_POST['productName'] ?? '');
         $pDesc = trim($_POST['productDescription'] ?? '');
@@ -38,23 +34,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pQty = intval($_POST['productQuantity'] ?? 0);
         $catId = intval($_POST['CategoryId'] ?? 0);
 
-        $pImage = "placeholder.jpg"; // Default backup fallback
+        $pImage = "placeholder.jpg";
 
-        // Process File Uploading
         if (isset($_FILES['productImage']) && $_FILES['productImage']['error'] === UPLOAD_ERR_OK) {
             $fileTmpPath = $_FILES['productImage']['tmp_name'];
             $fileName = $_FILES['productImage']['name'];
-
-            // Clean up the filename to avoid spaces/Arabic characters causing link breaks
             $fileExtension = pathinfo($fileName, PATHINFO_EXTENSION);
             $newFileName = time() . '_' . rand(1000, 9999) . '.' . $fileExtension;
-
-            // Target destination path
             $uploadFileDir = './uploads/';
             $dest_path = $uploadFileDir . $newFileName;
 
             if (move_uploaded_file($fileTmpPath, $dest_path)) {
-                $pImage = $newFileName; // Save this newly generated unique filename string
+                $pImage = $newFileName;
             }
         }
 
@@ -62,32 +53,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 $stmt = $pdo->prepare("INSERT INTO Product (productName, productDescription, productPrice, productQuantity, productImage, CategoryId) VALUES (?, ?, ?, ?, ?, ?)");
                 $stmt->execute([$pName, $pDesc, $pPrice, $pQty, $pImage, $catId]);
-                $message = "تم إضافة المنتج مع الصورة بنجاح إلى المخزن!";
+                $message = "Product added to inventory successfully!";
             } catch (PDOException $e) {
-                $message = "خطأ أثناء إضافة المنتج: " . $e->getMessage();
+                $message = "Error adding product: " . $e->getMessage();
             }
         } else {
-            $message = "الرجاء تعبئة الحقول الأساسية للمنتج بصورة صحيحة.";
+            $message = "Please fill in all mandatory fields correctly.";
         }
     }
 }
 
-// 2. Fetch inventory values to feed the control tables
 try {
     $categories = $pdo->query("SELECT * FROM Category")->fetchAll();
     $products = $pdo->query("SELECT p.*, c.CategoryName FROM Product p LEFT JOIN Category c ON p.CategoryId = c.CategoryId")->fetchAll();
-    $users = $pdo->query("SELECT userId, userName, email, role, phonenu FROM User")->fetchAll();
+    $users = $pdo->query("SELECT userId, userName, email, role FROM User")->fetchAll();
 } catch (PDOException $e) {
-    die("خطأ في الاتصال: " . $e->getMessage());
+    die("Connection error: " . $e->getMessage());
 }
 ?>
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم المشرف | Arabic Luxury Store</title>
+    <title>Admin Dashboard | Management Panel</title>
     <style>
         :root {
             --primary-gold: #D4AF37;
@@ -132,12 +122,11 @@ try {
             color: var(--primary-gold);
             padding: 15px;
             border-radius: 6px;
-            border-right: 4px solid var(--primary-gold);
+            border-left: 4px solid var(--primary-gold);
             margin-bottom: 20px;
             font-weight: bold;
         }
 
-        /* Layout Admin Sections Grid */
         .admin-section {
             background-color: var(--card-bg);
             border: 1px solid #2A2A2A;
@@ -196,18 +185,12 @@ try {
             border-radius: 4px;
             cursor: pointer;
             width: fit-content;
-            align-self: flex-end;
         }
 
-        .btn-submit:hover {
-            background-color: #e5be42;
-        }
-
-        /* Table Control Styles */
         table {
             width: 100%;
             border-collapse: collapse;
-            text-align: right;
+            text-align: left;
             margin-top: 15px;
         }
 
@@ -235,8 +218,8 @@ try {
 <body>
 
     <header>
-        <span class="logo">👑 لوحة التحكم وإدارة النظام (Admin Panel)</span>
-        <a href="index.php" style="color:#fff; text-decoration:none;">⬅ العودة للموقع الرئيسي</a>
+        <span class="logo">⚙️ System Administration Dashboard</span>
+        <a href="index.php" style="color:#fff; text-decoration:none;">← Return to Main Website</a>
     </header>
 
     <div class="dashboard-container">
@@ -246,29 +229,29 @@ try {
         <?php endif; ?>
 
         <div class="admin-section">
-            <h2>📁 إدارة الفئات (Manage Categories)</h2>
+            <h2>📁 Manage Categories</h2>
             <form method="POST" style="margin-bottom: 25px;">
                 <input type="hidden" name="action" value="add_category">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>اسم الفئة الجديد *</label>
-                        <input type="text" name="CategoryName" required placeholder="مثال: عطور عود">
+                        <label>Category Name *</label>
+                        <input type="text" name="CategoryName" required placeholder="e.g., Luxury Perfumes">
                     </div>
                     <div class="form-group">
-                        <label>وصف الفئة</label>
-                        <input type="text" name="CategoryDescription" placeholder="وصف مختصر...">
+                        <label>Category Description</label>
+                        <input type="text" name="CategoryDescription" placeholder="Brief description...">
                     </div>
-                    <button type="submit" class="btn-submit">حفظ الفئة</button>
+                    <button type="submit" class="btn-submit" style="margin-top:22px;">Save Category</button>
                 </div>
             </form>
 
-            <h3>الفئات الحالية</h3>
+            <h3>Current Product Categories</h3>
             <table>
                 <thead>
                     <tr>
-                        <th>معرف الفئة (ID)</th>
-                        <th>اسم الفئة</th>
-                        <th>الوصف</th>
+                        <th>Category ID</th>
+                        <th>Category Name</th>
+                        <th>Description</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -284,18 +267,18 @@ try {
         </div>
 
         <div class="admin-section">
-            <h2>📦 إدارة المنتجات والمخزن (Manage Products)</h2>
+            <h2>📦 Manage Products & Inventory Stock</h2>
             <form method="POST" enctype="multipart/form-data" style="margin-bottom: 25px;">
                 <input type="hidden" name="action" value="add_product">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>اسم المنتج *</label>
+                        <label>Product Name *</label>
                         <input type="text" name="productName" required>
                     </div>
                     <div class="form-group">
-                        <label>الفئة التابع لها *</label>
+                        <label>Assigned Category *</label>
                         <select name="CategoryId" required>
-                            <option value="">-- اختر فئة --</option>
+                            <option value="">-- Select Category --</option>
                             <?php foreach ($categories as $cat): ?>
                                 <option value="<?php echo $cat['CategoryId']; ?>">
                                     <?php echo htmlspecialchars($cat['CategoryName']); ?></option>
@@ -303,36 +286,36 @@ try {
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>السعر الأساسي *</label>
-                        <input type="number" step="0.01" name="productPrice" required placeholder="0.00 ر.س">
+                        <label>Base Price ($) *</label>
+                        <input type="number" step="0.01" name="productPrice" required>
                     </div>
                     <div class="form-group">
-                        <label>الكمية بالمخزن (Stock) *</label>
+                        <label>Stock Quantity *</label>
                         <input type="number" name="productQuantity" required value="10">
                     </div>
                 </div>
                 <div class="form-grid" style="grid-template-columns: 2fr 1fr; margin-bottom:15px;">
                     <div class="form-group">
-                        <label>وصف تفصيلي للمنتج</label>
+                        <label>Product Description</label>
                         <textarea name="productDescription" rows="2"></textarea>
                     </div>
                     <div class="form-group">
-                        <label>صورة المنتج *</label>
+                        <label>Product Image File *</label>
                         <input type="file" name="productImage" accept="image/*" style="padding:7px;" required>
                     </div>
                 </div>
-                <button type="submit" class="btn-submit">إضافة المنتج إلى الكتالوج</button>
+                <button type="submit" class="btn-submit">Add Product to Catalogue</button>
             </form>
 
-            <h3>المنتجات المتوفرة حالياً بالمخازن</h3>
+            <h3>Active Inventory Items</h3>
             <table>
                 <thead>
                     <tr>
-                        <th>معرف المنتج</th>
-                        <th>المنتج</th>
-                        <th>الفئة</th>
-                        <th>السعر</th>
-                        <th>الكمية المتاحة</th>
+                        <th>Product ID</th>
+                        <th>Product Name</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Available Stock</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -341,12 +324,12 @@ try {
                             <td>#<?php echo $prod['productId']; ?></td>
                             <td><strong><?php echo htmlspecialchars($prod['productName']); ?></strong></td>
                             <td><span
-                                    class="badge"><?php echo htmlspecialchars($prod['CategoryName'] ?? 'غير مصنف'); ?></span>
+                                    class="badge"><?php echo htmlspecialchars($prod['CategoryName'] ?? 'Uncategorized'); ?></span>
                             </td>
-                            <td><?php echo number_format($prod['productPrice'], 2); ?> ر.س</td>
+                            <td>$<?php echo number_format($prod['productPrice'], 2); ?></td>
                             <td>
                                 <strong style="color: <?php echo $prod['productQuantity'] < 5 ? '#FF4D4D' : '#4BB543'; ?>">
-                                    <?php echo $prod['productQuantity']; ?> وحدات
+                                    <?php echo $prod['productQuantity']; ?> units
                                 </strong>
                             </td>
                         </tr>
@@ -356,14 +339,14 @@ try {
         </div>
 
         <div class="admin-section">
-            <h2>👥 إدارة مستخدمين النظام (Manage Users)</h2>
+            <h2>👥 Registered System Users</h2>
             <table>
                 <thead>
                     <tr>
-                        <th>رقم المستخدم</th>
-                        <th>الاسم</th>
-                        <th>البريد الإلكتروني</th>
-                        <th>نوع الحساب (Role)</th>
+                        <th>User ID</th>
+                        <th>Username</th>
+                        <th>Email Address</th>
+                        <th>Account Permissions (Role)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -375,7 +358,7 @@ try {
                             <td>
                                 <span
                                     style="font-weight:bold; color: <?php echo $u['role'] === 'admin' ? 'var(--primary-gold)' : '#fff'; ?>">
-                                    <?php echo $u['role'] === 'admin' ? '⚙️ مشرف النظام' : '👤 عميل'; ?>
+                                    <?php echo $u['role'] === 'admin' ? '⚙️ System Admin' : '👤 Customer'; ?>
                                 </span>
                             </td>
                         </tr>

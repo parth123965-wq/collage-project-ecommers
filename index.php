@@ -3,25 +3,23 @@
 session_start();
 require_once 'db_connect.php';
 
-// Fetch all categories
 try {
     $catQuery = $pdo->query("SELECT * FROM Category");
     $categories = $catQuery->fetchAll();
 
-    // Fetch all products with their associated Category Name using a JOIN
     $prodQuery = $pdo->query("SELECT p.*, c.CategoryName FROM Product p LEFT JOIN Category c ON p.CategoryId = c.CategoryId");
     $products = $prodQuery->fetchAll();
 } catch (PDOException $e) {
-    die("خطأ في جلب البيانات: " . $e->getMessage());
+    die("Data fetch error: " . $e->getMessage());
 }
 ?>
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>المتجر العربي الفاخر | الصفحة الرئيسية</title>
+    <title>Arabic Luxury Store | Home</title>
     <style>
         :root {
             --primary-gold: #D4AF37;
@@ -39,7 +37,6 @@ try {
             padding: 0;
         }
 
-        /* Navbar Header Styling */
         header {
             background-color: #0F0F0F;
             border-bottom: 2px solid var(--primary-gold);
@@ -54,6 +51,7 @@ try {
             font-weight: bold;
             color: var(--primary-gold);
             text-decoration: none;
+            letter-spacing: 1px;
         }
 
         .nav-user-actions {
@@ -69,6 +67,12 @@ try {
 
         .welcome-text strong {
             color: var(--primary-gold);
+        }
+
+        .btn-cart {
+            color: var(--primary-gold);
+            text-decoration: none;
+            font-weight: bold;
         }
 
         .btn-logout {
@@ -94,7 +98,6 @@ try {
             border-radius: 4px;
         }
 
-        /* Hero Banner */
         .hero-banner {
             text-align: center;
             padding: 60px 20px;
@@ -114,7 +117,6 @@ try {
             margin: 0;
         }
 
-        /* Main Content Container */
         .main-container {
             max-width: 1200px;
             margin: 40px auto;
@@ -123,12 +125,11 @@ try {
 
         .section-title {
             color: var(--primary-gold);
-            border-right: 4px solid var(--primary-gold);
-            padding-right: 12px;
+            border-left: 4px solid var(--primary-gold);
+            padding-left: 12px;
             margin-bottom: 30px;
         }
 
-        /* Product Grid Grid Layout */
         .products-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -149,16 +150,6 @@ try {
         .product-card:hover {
             transform: translateY(-5px);
             border-color: var(--primary-gold);
-        }
-
-        .product-image-placeholder {
-            background-color: #2D2D2D;
-            height: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-muted);
-            font-size: 14px;
         }
 
         .product-info {
@@ -223,29 +214,32 @@ try {
 <body>
 
     <header>
-        <a href="index.php" class="logo">الْمَتْجَرُ العَرَبِيُّ</a>
+        <a href="index.php" class="logo">ARABIC LUXURY Store</a>
 
         <div class="nav-user-actions">
             <?php if (isset($_SESSION['user_id'])): ?>
-                <span class="welcome-text">مرحباً،
+                <span class="welcome-text">Welcome,
                     <strong><?php echo htmlspecialchars($_SESSION['user_name']); ?></strong></span>
-                <a href="cart.php"
-                    style="color: var(--primary-gold); text-decoration: none; font-weight: bold; margin: 0 15px;">🛒 سلة
-                    المشتريات</a>
-                <a href="logout.php" class="btn-logout">تسجيل الخروج</a>
+                <a href="cart.php" class="btn-cart">🛒 Shopping Cart</a>
+
+                <?php if ($_SESSION['role'] === 'admin'): ?>
+                    <a href="admin_dashboard.php" style="color: cyan; text-decoration: none; font-size:14px;">Dashboard</a>
+                <?php endif; ?>
+
+                <a href="logout.php" class="btn-logout">Logout</a>
             <?php else: ?>
-                <a href="login.html" class="btn-login">تسجيل الدخول</a>
+                <a href="login.html" class="btn-login">Login / Sign In</a>
             <?php endif; ?>
         </div>
     </header>
 
     <div class="hero-banner">
-        <h1>مجمُوعة الفخامة الشرقية</h1>
-        <p>اكتشف أفضل العطور والملبوسات العربية التراثية المصممة بعناية</p>
+        <h1>Eastern Luxury Collection</h1>
+        <p>Discover the finest authentic Arab fragrances and heritage collections</p>
     </div>
 
     <div class="main-container">
-        <h2 class="section-title">منتجاتنا المميزة</h2>
+        <h2 class="section-title">Featured Products</h2>
 
         <div class="products-grid">
             <?php if (count($products) > 0): ?>
@@ -258,37 +252,36 @@ try {
                                     alt="<?php echo htmlspecialchars($product['productName']); ?>"
                                     style="width: 100%; height: 100%; object-fit: cover;">
                             <?php else: ?>
-                                <span style="color: var(--text-muted); font-size: 14px;">📦 لا توجد صورة</span>
+                                <span style="color: var(--text-muted); font-size: 14px;">📦 No Image Available</span>
                             <?php endif; ?>
                         </div>
 
                         <div class="product-info">
                             <span
-                                class="product-category"><?php echo htmlspecialchars($product['CategoryName'] ?? 'عام'); ?></span>
+                                class="product-category"><?php echo htmlspecialchars($product['CategoryName'] ?? 'General'); ?></span>
                             <h3 class="product-name"><?php echo htmlspecialchars($product['productName']); ?></h3>
                             <p class="product-desc"><?php echo htmlspecialchars($product['productDescription']); ?></p>
 
                             <div class="product-meta">
-                                <span class="product-price"><?php echo number_format($product['productPrice'], 2); ?> ر.س</span>
-                                <button class="btn-add-cart" onclick="addToCart(<?php echo $product['productId']; ?>)">أضف
-                                    للسلة</button>
+                                <span class="product-price">$<?php echo number_format($product['productPrice'], 2); ?></span>
+                                <button class="btn-add-cart" onclick="addToCart(<?php echo $product['productId']; ?>)">Add to
+                                    Cart</button>
                             </div>
                         </div>
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
-                <p>لا توجد منتجات متوفرة حالياً.</p>
+                <p>No products available at the moment.</p>
             <?php endif; ?>
         </div>
     </div>
 
     <script>
-        // Replace the old addToCart function inside your index.php script section with this:
         async function addToCart(productId) {
             const isLoggedIn = <?php echo isset($_SESSION['user_id']) ? 'true' : 'false'; ?>;
 
             if (!isLoggedIn) {
-                alert('الرجاء تسجيل الدخول أولاً لتتمكن من إضافة المنتجات للسلة!');
+                alert('Please login first to add items to your cart!');
                 window.location.href = 'login.html';
                 return;
             }
@@ -304,12 +297,11 @@ try {
 
                 if (result.success) {
                     alert(result.message);
-                    // Optional: You could redirect users directly to a cart preview screen here
                 } else {
-                    alert('خطأ: ' + result.message);
+                    alert('Error: ' + result.message);
                 }
             } catch (error) {
-                alert('حدث خطأ غير متوقع أثناء الاتصال بخادم السلة.');
+                alert('An unexpected error occurred while adding to cart.');
             }
         }
     </script>
