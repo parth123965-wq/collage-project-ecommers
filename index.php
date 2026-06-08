@@ -229,6 +229,9 @@ try {
             <?php if (isset($_SESSION['user_id'])): ?>
                 <span class="welcome-text">مرحباً،
                     <strong><?php echo htmlspecialchars($_SESSION['user_name']); ?></strong></span>
+                <a href="cart.php"
+                    style="color: var(--primary-gold); text-decoration: none; font-weight: bold; margin: 0 15px;">🛒 سلة
+                    المشتريات</a>
                 <a href="logout.php" class="btn-logout">تسجيل الخروج</a>
             <?php else: ?>
                 <a href="login.html" class="btn-login">تسجيل الدخول</a>
