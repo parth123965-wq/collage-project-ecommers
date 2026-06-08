@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل مستخدم جديد | Arabic Luxury Store</title>
+    <title>Create New Account | Arabic Luxury Store</title>
     <style>
         :root {
             --primary-gold: #D4AF37;
@@ -92,46 +92,60 @@
             margin-top: 15px;
             font-size: 14px;
         }
+
+        .switch-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .switch-link a {
+            color: var(--primary-gold);
+            text-decoration: none;
+        }
     </style>
 </head>
 
 <body>
 
     <div class="register-container">
-        <h2>إنشاء حساب جديد (Register)</h2>
+        <h2>Create New Account</h2>
         <form id="registerForm">
             <div class="form-group">
-                <label>اسم المستخدم *</label>
-                <input type="text" id="userName" required>
+                <label>Username *</label>
+                <input type="text" id="userName" placeholder="Enter your full name" required>
             </div>
             <div class="form-group">
-                <label>البريد الإلكتروني *</label>
-                <input type="email" id="email" required>
+                <label>Email Address *</label>
+                <input type="email" id="email" placeholder="name@example.com" required>
             </div>
             <div class="form-group">
-                <label>كلمة المرور *</label>
-                <input type="password" id="password" required>
+                <label>Password *</label>
+                <input type="password" id="password" placeholder="Create a secure password" required>
             </div>
             <div class="form-group">
-                <label>العنوان</label>
-                <textarea id="address" rows="2"></textarea>
+                <label>Shipping Address</label>
+                <textarea id="address" rows="2" placeholder="Street, City, Country"></textarea>
             </div>
             <div class="form-group">
-                <label>رقم الهاتف</label>
-                <input type="text" id="phonenu">
+                <label>Phone Number</label>
+                <input type="text" id="phonenu" placeholder="e.g., +966500000000">
             </div>
             <div class="form-group">
-                <label>تاريخ الميلاد</label>
+                <label>Date of Birth</label>
                 <input type="date" id="dob">
             </div>
-            <button type="submit">تسجيل الحساب</button>
+            <button type="submit">Register Account</button>
         </form>
         <div id="msg" class="message"></div>
+        <div class="switch-link">
+            <p>Already have an account? <a href="login.html">Login here</a></p>
+        </div>
     </div>
 
     <script>
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
-            e.preventDefault(); // Stop page from reloading
+            e.preventDefault();
 
             const data = {
                 userName: document.getElementById('userName').value,
@@ -143,7 +157,8 @@
             };
 
             const msgDiv = document.getElementById('msg');
-            msgDiv.textContent = 'جاري التسجيل...';
+            msgDiv.textContent = 'Registering your account...';
+            msgDiv.style.color = 'var(--text-muted)';
 
             try {
                 const response = await fetch('register_api.php', {
@@ -156,16 +171,19 @@
 
                 if (result.success) {
                     msgDiv.style.color = '#4BB543';
-                    msgDiv.textContent = result.message;
+                    msgDiv.textContent = result.message + ' Redirecting to login...';
                     document.getElementById('registerForm').reset();
-                    // We will add redirection to login page here later!
+
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
                 } else {
                     msgDiv.style.color = '#FF3333';
                     msgDiv.textContent = result.message;
                 }
             } catch (error) {
                 msgDiv.style.color = '#FF3333';
-                msgDiv.textContent = 'حدث خطأ في الاتصال بالسيرفر.';
+                msgDiv.textContent = 'A network error occurred connection to the server.';
             }
         });
     </script>

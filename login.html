@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل الدخول | Arabic Luxury Store</title>
+    <title>Account Login | Arabic Luxury Store</title>
     <style>
         :root {
             --primary-gold: #D4AF37;
@@ -108,21 +108,21 @@
 <body>
 
     <div class="login-container">
-        <h2>تسجيل الدخول (Login)</h2>
+        <h2>Account Login</h2>
         <form id="loginForm">
             <div class="form-group">
-                <label>البريد الإلكتروني</label>
-                <input type="email" id="email" required>
+                <label>Email Address</label>
+                <input type="email" id="email" placeholder="name@example.com" required>
             </div>
             <div class="form-group">
-                <label>كلمة المرور</label>
-                <input type="password" id="password" required>
+                <label>Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required>
             </div>
-            <button type="submit">دخول</button>
+            <button type="submit">Sign In</button>
         </form>
         <div id="msg" class="message"></div>
         <div class="switch-link">
-            <p>ليس لديك حساب؟ <a href="register.html">سجل الآن من هنا</a></p>
+            <p>Don't have an account yet? <a href="register.html">Register here</a></p>
         </div>
     </div>
 
@@ -136,7 +136,8 @@
             };
 
             const msgDiv = document.getElementById('msg');
-            msgDiv.textContent = 'جاري التحقق...';
+            msgDiv.textContent = 'Verifying credentials...';
+            msgDiv.style.color = 'var(--text-muted)';
 
             try {
                 const response = await fetch('login_api.php', {
@@ -161,7 +162,7 @@
                 }
             } catch (error) {
                 msgDiv.style.color = '#FF3333';
-                msgDiv.textContent = 'حدث خطأ في الاتصال.';
+                msgDiv.textContent = 'An error occurred during server validation.';
             }
         });
     </script>
