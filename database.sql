@@ -16,7 +16,8 @@ CREATE TABLE IF NOT EXISTS `User` (
     `password` VARCHAR(255) NOT NULL, -- Increased length for secure password hashing
     `address` TEXT,
     `phonenu` VARCHAR(20), -- Changed to VARCHAR to preserve leading zeros in phone numbers
-    `dob` DATE
+    `dob` DATE,
+    `role` VARCHAR(20) NOT NULL DEFAULT 'customer'
 ) ENGINE=InnoDB;
 
 -- 3. Product Table

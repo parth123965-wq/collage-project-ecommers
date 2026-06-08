@@ -251,8 +251,15 @@ try {
             <?php if (count($products) > 0): ?>
                 <?php foreach ($products as $product): ?>
                     <div class="product-card">
-                        <div class="product-image-placeholder">
-                            📦 [صورة: <?php echo htmlspecialchars($product['productName']); ?>]
+                        <div
+                            style="width: 100%; height: 220px; background-color: #252525; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                            <?php if (!empty($product['productImage']) && file_exists('./uploads/' . $product['productImage'])): ?>
+                                <img src="./uploads/<?php echo htmlspecialchars($product['productImage']); ?>"
+                                    alt="<?php echo htmlspecialchars($product['productName']); ?>"
+                                    style="width: 100%; height: 100%; object-fit: cover;">
+                            <?php else: ?>
+                                <span style="color: var(--text-muted); font-size: 14px;">📦 لا توجد صورة</span>
+                            <?php endif; ?>
                         </div>
 
                         <div class="product-info">

@@ -29,6 +29,7 @@
                 $_SESSION['email']     = $user['email'];
                 $_SESSION['address']   = $user['address'];
                 $_SESSION['phonenu']   = $user['phonenu'];
+                $_SESSION['role']      = $user['role'];
 
                 echo json_encode([
                     'success' => true, 
