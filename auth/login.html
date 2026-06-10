@@ -122,7 +122,7 @@
         </form>
         <div id="msg" class="message"></div>
         <div class="switch-link">
-            <p>Don't have an account yet? <a href="register.html">Register here</a></p>
+            <p>Don't have an account yet? <a href="../auth/register.html">Register here</a></p>
         </div>
     </div>
 
@@ -140,7 +140,7 @@
             msgDiv.style.color = 'var(--text-muted)';
 
             try {
-                const response = await fetch('login_api.php', {
+                const response = await fetch('../api/login_api.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
@@ -154,7 +154,7 @@
 
                     // Redirect to homepage store index after a small delay
                     setTimeout(() => {
-                        window.location.href = 'index.php';
+                        window.location.href = '../public/index.php';
                     }, 1200);
                 } else {
                     msgDiv.style.color = '#FF3333';

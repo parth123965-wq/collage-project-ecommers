@@ -2,7 +2,7 @@
     // login_api.php
     session_start();
     header('Content-Type: application/json');
-    require_once 'db_connect.php';
+    require_once '../config/db_connect.php';
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $input = json_decode(file_get_contents('php://input'), true);

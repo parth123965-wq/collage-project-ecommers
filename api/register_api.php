@@ -1,7 +1,7 @@
 <?php
     // register_api.php
     header('Content-Type: application/json');
-    require_once 'db_connect.php';
+    require_once '../config/db_connect.php';
 
     // Check if data is coming through a POST request
     if ($_SERVER['REQUEST_URI'] ?? $_SERVER['REQUEST_METHOD'] === 'POST') {

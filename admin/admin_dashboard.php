@@ -1,7 +1,7 @@
 <?php
 // admin_dashboard.php
 session_start();
-require_once 'db_connect.php';
+require_once '../config/db_connect.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     die("<h2 style='color:red; text-align:center; margin-top:50px;'>Access Denied. Administrators Only.</h2>");
@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $fileName = $_FILES['productImage']['name'];
             $fileExtension = pathinfo($fileName, PATHINFO_EXTENSION);
             $newFileName = time() . '_' . rand(1000, 9999) . '.' . $fileExtension;
-            $uploadFileDir = './uploads/';
+            $uploadFileDir = '../uploads/';
             $dest_path = $uploadFileDir . $newFileName;
 
             if (move_uploaded_file($fileTmpPath, $dest_path)) {
@@ -219,7 +219,7 @@ try {
 
     <header>
         <span class="logo">⚙️ System Administration Dashboard</span>
-        <a href="index.php" style="color:#fff; text-decoration:none;">← Return to Main Website</a>
+        <a href="../public/index.php" style="color:#fff; text-decoration:none;">← Return to Main Website</a>
     </header>
 
     <div class="dashboard-container">

@@ -2,7 +2,7 @@
     // add_to_cart_api.php
     session_start();
     header('Content-Type: application/json');
-    require_once 'db_connect.php';
+    require_once '../config/db_connect.php';
 
     // Check if user is logged in
     if (!isset($_SESSION['user_id'])) {

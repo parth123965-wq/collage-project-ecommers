@@ -139,7 +139,7 @@
         </form>
         <div id="msg" class="message"></div>
         <div class="switch-link">
-            <p>Already have an account? <a href="login.html">Login here</a></p>
+            <p>Already have an account? <a href="../auth/login.html">Login here</a></p>
         </div>
     </div>
 
@@ -161,7 +161,7 @@
             msgDiv.style.color = 'var(--text-muted)';
 
             try {
-                const response = await fetch('register_api.php', {
+                const response = await fetch('../api/register_api.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
@@ -175,7 +175,7 @@
                     document.getElementById('registerForm').reset();
 
                     setTimeout(() => {
-                        window.location.href = 'login.html';
+                        window.location.href = '../auth/login.html';
                     }, 2000);
                 } else {
                     msgDiv.style.color = '#FF3333';

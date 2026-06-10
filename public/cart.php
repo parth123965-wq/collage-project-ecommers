@@ -1,10 +1,10 @@
 <?php
 // cart.php
 session_start();
-require_once 'db_connect.php';
+require_once '../config/db_connect.php';
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.html");
+    header("Location: ../auth/login.html");
     exit;
 }
 
@@ -220,10 +220,10 @@ try {
 <body>
 
     <header>
-        <a href="index.php" class="logo">ARABIC LUXURY</a>
+        <a href="../public/index.php" class="logo">ARABIC LUXURY</a>
         <div class="nav-links">
-            <a href="index.php">Home Shop</a>
-            <a href="logout.php" style="color: #FF4D4D;">Logout</a>
+            <a href="../public/index.php">Home Shop</a>
+            <a href="../api/logout.php" style="color: #FF4D4D;">Logout</a>
         </div>
     </header>
 
@@ -300,7 +300,7 @@ try {
         <?php else: ?>
             <div style="text-align: center; padding: 40px; background-color: var(--card-bg); border-radius: 8px;">
                 <p style="color: var(--text-muted); font-size: 18px;">Your shopping cart is currently empty.</p>
-                <a href="index.php" style="color: var(--primary-gold); text-decoration: none; font-weight: bold;">Return to
+                <a href="../public/index.php" style="color: var(--primary-gold); text-decoration: none; font-weight: bold;">Return to
                     Store</a>
             </div>
         <?php endif; ?>

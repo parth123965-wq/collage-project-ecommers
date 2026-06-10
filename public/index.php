@@ -1,7 +1,7 @@
 <?php
 // index.php
 session_start();
-require_once 'db_connect.php';
+require_once '../config/db_connect.php';
 
 try {
     $catQuery = $pdo->query("SELECT * FROM Category");
@@ -214,21 +214,21 @@ try {
 <body>
 
     <header>
-        <a href="index.php" class="logo">ARABIC LUXURY Store</a>
+        <a href="../public/index.php" class="logo">ARABIC LUXURY Store</a>
 
         <div class="nav-user-actions">
             <?php if (isset($_SESSION['user_id'])): ?>
                 <span class="welcome-text">Welcome,
                     <strong><?php echo htmlspecialchars($_SESSION['user_name']); ?></strong></span>
-                <a href="cart.php" class="btn-cart">🛒 Shopping Cart</a>
+                <a href="../public/cart.php" class="btn-cart">🛒 Shopping Cart</a>
 
                 <?php if ($_SESSION['role'] === 'admin'): ?>
-                    <a href="admin_dashboard.php" style="color: cyan; text-decoration: none; font-size:14px;">Dashboard</a>
+                    <a href="../admin/admin_dashboard.php" style="color: cyan; text-decoration: none; font-size:14px;">Dashboard</a>
                 <?php endif; ?>
 
-                <a href="logout.php" class="btn-logout">Logout</a>
+                <a href="../api/logout.php" class="btn-logout">Logout</a>
             <?php else: ?>
-                <a href="login.html" class="btn-login">Login / Sign In</a>
+                <a href="../auth/login.html" class="btn-login">Login / Sign In</a>
             <?php endif; ?>
         </div>
     </header>
@@ -247,8 +247,8 @@ try {
                     <div class="product-card">
                         <div
                             style="width: 100%; height: 220px; background-color: #252525; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                            <?php if (!empty($product['productImage']) && file_exists('./uploads/' . $product['productImage'])): ?>
-                                <img src="./uploads/<?php echo htmlspecialchars($product['productImage']); ?>"
+                            <?php if (!empty($product['productImage']) && file_exists('../uploads/' . $product['productImage'])): ?>
+                                <img src="../uploads/<?php echo htmlspecialchars($product['productImage']); ?>"
                                     alt="<?php echo htmlspecialchars($product['productName']); ?>"
                                     style="width: 100%; height: 100%; object-fit: cover;">
                             <?php else: ?>
@@ -287,7 +287,7 @@ try {
             }
 
             try {
-                const response = await fetch('add_to_cart_api.php', {
+                const response = await fetch('../api/add_to_cart_api.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ productId: productId, quantity: 1 })
