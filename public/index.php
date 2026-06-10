@@ -248,9 +248,7 @@ try {
                         <div
                             style="width: 100%; height: 220px; background-color: #252525; display: flex; align-items: center; justify-content: center; overflow: hidden;">
                             <?php if (!empty($product['productImage']) && file_exists('../uploads/' . $product['productImage'])): ?>
-                                <img src="../uploads/<?php echo htmlspecialchars($product['productImage']); ?>"
-                                    alt="<?php echo htmlspecialchars($product['productName']); ?>"
-                                    style="width: 100%; height: 100%; object-fit: cover;">
+                                <img src="../uploads/<?php echo htmlspecialchars($product['productImage']); ?>" alt="Product">
                             <?php else: ?>
                                 <span style="color: var(--text-muted); font-size: 14px;">📦 No Image Available</span>
                             <?php endif; ?>
