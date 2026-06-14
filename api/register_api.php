@@ -4,7 +4,7 @@
     require_once '../config/db_connect.php';
 
     // Check if data is coming through a POST request
-    if ($_SERVER['REQUEST_URI'] ?? $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Get raw JSON data from frontend JavaScript
         $input = json_decode(file_get_contents('php://input'), true);
 
